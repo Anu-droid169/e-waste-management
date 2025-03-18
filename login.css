@@ -1,0 +1,70 @@
+/* style.css */
+
+/* ... (Previous CSS - keep your existing general, header styles) ... */
+
+/* Login Form Styles with Background and Animation */
+.login-container {
+    width: 400px;
+    margin: 50px auto;
+    padding: 30px;
+    background-color: rgba(0, 0, 50, 0.9); /* Semi-transparent dark blue */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+    text-align: center;
+    position: relative; /* Needed for animation */
+    overflow: hidden; /* Clip any overflowing content */
+    animation: fadeIn 1s ease-in-out; /* Fade-in animation */
+    color: white; /* Ensure text is readable on dark background */
+}
+
+/*  Remove Background Image - important! */
+.login-container::before {
+    /*  NO background image or opacity */
+    content: "";
+    display: none;  /* completely hide the pseudo-element */
+
+}
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px); /* Start slightly above */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0); /* End at its normal position */
+    }
+}
+
+/*  Existing styles for h2, input, button, p, and a - keep these! */
+.login-container h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #ddd; /* Lighter color for heading on dark background */
+}
+
+.login-container input {
+   /* ... (rest of the input styles) ... */
+   background-color: #f0f0f0; /* Lighter background for inputs */
+   border: 1px solid #ccc;
+   color: #333;
+}
+
+.login-container button {
+   /* ... (rest of the button styles) ... */
+   background-color: #4CAF50; /* Green button */
+   color: white;
+   border: none;
+}
+
+.login-container p {
+   /* ... (rest of the p styles) ... */
+    color: #ccc; /* Lighter color for paragraphs on dark background */
+}
+
+.login-container a {
+   /* ... (rest of the a styles) ... */
+    color: #80bfff; /* Lighter color for links on dark background */
+}

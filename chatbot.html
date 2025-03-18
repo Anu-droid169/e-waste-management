@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI E-Waste Chatbot (With Speech)</title>
+    <style>
+body {
+            font-family: sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            transition: background 0.5s ease-in-out, color 0.5s ease-in-out;
+        }
+
+        .chatbot-container {
+            background: linear-gradient(144deg, #af40ff, #5b42f3 50%, #00ddeb);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            overflow: hidden;
+            padding: 10px;
+            transition: background 0.5s ease-in-out, color 0.5s ease-in-out;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(45deg, #e81cff, #40c9ff);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .chatbot-messages {
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            border-bottom: 1px solid #ddd;
+            background-color: #fff;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .message {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .bot-message, .user-message {
+            background: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
+            color: white;
+        }
+
+        .chatbot-input {
+            padding: 10px;
+            display: flex;
+            background: #fff;
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .chatbot-input button, #cameraButton, #uploadButton, #captureButton {
+            background: linear-gradient(45deg, #e81cff, #40c9ff);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+
+
+        /* Dark Mode */
+        .dark-mode {
+            background-color: #121212 !important;
+            color: #ffffff !important;
+        }
+
+        .dark-mode .chatbot-container {
+            background: #333 !important;
+            color: #fff !important;
+        }
+
+        /* 3D Neon Mode */
+        .neon-mode {
+            background: linear-gradient(135deg, #ff00ff, #00ffff, #ffcc00);
+            background-size: 400% 400%;
+            animation: gradientBG 6s infinite linear;
+            color: #ffffff !important;
+        }
+
+        .neon-mode .chatbot-container {
+            background: linear-gradient(135deg, #ff00ff, #00ffff, #ffcc00) !important;
+            background-size: 400% 400%;
+            animation: gradientBG 6s infinite linear;
+            color: #ffffff !important;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        #themeSelector {
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-weight: bold;
+            background: linear-gradient(45deg, #e81cff, #40c9ff);
+            color: black;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="chatbot-container">
+        <div class="chatbot-header">
+            <h1>Eco Buddy</h1>
+                        <select id="themeSelector">
+                <option value="light">☀ Light Mode</option>
+                <option value="dark">🌙 Dark Mode</option>
+                <option value="neon">🌟 3D Neon Theme</option>
+            </select>
+                <script>
+        document.getElementById('themeSelector').addEventListener('change', function () {
+            document.body.className = '';
+            document.querySelector('.chatbot-container').className = 'chatbot-container';
+            
+            if (this.value === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.querySelector('.chatbot-container').classList.add('dark-mode');
+            } else if (this.value === 'neon') {
+                document.body.classList.add('neon-mode');
+                document.querySelector('.chatbot-container').classList.add('neon-mode');
+            }
+        });
+    </script>
+
+
+        </div>
+<div class="chatbot-messages" id="chatMessages">
+    <div class="message bot-message">Welcome! How can I help you with your e-waste today?</div>
+</div>
+<div class="chatbot-input">
+    <input type="text" id="messageInput" placeholder="Type your message...">
+    <button id="sendButton">Send</button>
+    <button id="voiceButton">🎤 Speak</button>
+</div>
+<div id="imageSourceSection">
+    <button id="cameraButton">Use Camera</button>
+    <button id="uploadButton">Upload Image</button>
+
+</div>
+        <div id="cameraSection" style="display: none;">
+            <video id="cameraView" autoplay playsinline></video>
+            <button id="captureButton">Capture Image</button>
+        </div>
+<div id="imageUploadSection" style="display: none;">
+<input type="file" id="ewasteImage" accept="image/*">
+<img id="imagePreview" style="display: none; width: 200px; margin-top: 10px;">
+<button id="submitImage">Submit Image</button>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const messageInput = document.getElementById("messageInput");
+    const sendButton = document.getElementById("sendButton");
+    const chatMessages = document.getElementById("chatMessages");
+    const voiceButton = document.getElementById("voiceButton");
+    const cameraButton = document.getElementById("cameraButton");
+    const uploadButton = document.getElementById("uploadButton");
+    const cameraSection = document.getElementById("cameraSection");
+    const imageUploadSection = document.getElementById("imageUploadSection");
+    const cameraView = document.getElementById("cameraView");
+    const captureButton = document.getElementById("captureButton");
+    const imagePreview = document.getElementById("imagePreview");
+    const fileInput = document.getElementById("ewasteImage");
+    const submitImageButton = document.getElementById("submitImage");
+
+    let cameraStream = null;
+
+    // Function to add messages to chat
+    function addMessage(message, senderClass) {
+        if (!message.trim()) return; // Prevent empty messages
+
+        const messageDiv = document.createElement("div");
+        messageDiv.classList.add("message", senderClass);
+        messageDiv.textContent = message;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Speak bot's response
+        if (senderClass === "bot-message") {
+            speakMessage(message);
+        }
+    }
+
+    // Function to generate chatbot response
+    async function getBotResponse(messageText) {
+        messageText = messageText.toLowerCase();
+
+        if (messageText.includes("hello") || messageText.includes("hi")) {
+            return "Hello! How can I assist you with e-waste today?";
+        } else if (messageText.includes("recycle") || messageText.includes("waste")) {
+            return "You can recycle e-waste at authorized collection centers. Would you like to know the nearest one?";
+        } else if (messageText.includes("battery")) {
+            return "Used batteries should be disposed of at battery recycling centers.";
+        } else if (messageText.includes("thank you")) {
+            return "You're welcome! 😊";
+        } else {
+            return "I am here to help! Ask me anything about e-waste recycling.";
+        }
+    }
+
+    // Handle message sending
+    sendButton.addEventListener("click", async function () {
+        const userMessage = messageInput.value.trim();
+        if (userMessage) {
+            addMessage(userMessage, "user-message");
+            const botReply = await getBotResponse(userMessage);
+            addMessage(botReply, "bot-message");
+            messageInput.value = "";
+        }
+    });
+
+    // Allow Enter key to send message
+    messageInput.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            sendButton.click();
+        }
+    });
+
+    // Speech Recognition for voice input
+    voiceButton.addEventListener("click", function () {
+        try {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = "en-US";
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onstart = function () {
+                console.log("Voice recognition started...");
+            };
+
+            recognition.onresult = function (event) {
+                const transcript = event.results[0][0].transcript;
+                messageInput.value = transcript;
+                sendButton.click(); // Auto-send after speech
+            };
+
+            recognition.onerror = function (event) {
+                if (event.error === "not-allowed") {
+                    alert("Microphone access is blocked. Please allow microphone permissions.");
+                } else {
+                    console.warn("Voice recognition error:", event.error);
+                }
+            };
+
+            recognition.start();
+        } catch (error) {
+            alert("Speech recognition not supported in this browser. Try using Chrome.");
+        }
+    });
+
+    // Text-to-Speech for bot messages
+    function speakMessage(message) {
+        if ("speechSynthesis" in window) {
+            const speech = new SpeechSynthesisUtterance(message);
+            speech.lang = "en-US";
+            speech.volume = 1;
+            speech.rate = 1;
+            speech.pitch = 1;
+            window.speechSynthesis.speak(speech);
+        }
+    }
+
+    // Open Camera
+    cameraButton.addEventListener("click", async function () {
+        cameraSection.style.display = "block";
+        imageUploadSection.style.display = "none";
+
+        try {
+            cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+            cameraView.srcObject = cameraStream;
+        } catch (error) {
+            console.error("Error accessing camera:", error);
+            alert("Unable to access camera. Please check permissions.");
+        }
+    });
+
+    // Capture Image
+    captureButton.addEventListener("click", function () {
+        if (!cameraStream) {
+            alert("Camera is not active.");
+            return;
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = cameraView.videoWidth;
+        canvas.height = cameraView.videoHeight;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(cameraView, 0, 0, canvas.width, canvas.height);
+        imagePreview.src = canvas.toDataURL("image/png");
+        imagePreview.style.display = "block";
+
+        // Stop Camera
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraView.srcObject = null;
+        cameraStream = null;
+        cameraSection.style.display = "none";
+    });
+
+    // Open Upload Section
+    uploadButton.addEventListener("click", function () {
+        imageUploadSection.style.display = "block";
+        cameraSection.style.display = "none";
+    });
+
+    // Preview Uploaded Image
+    fileInput.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+
+        if (!file) {
+            alert("No file selected. Please choose an image.");
+            return;
+        }
+
+        // Ensure file is an image
+        const validImageTypes = ["image/jpeg", "image/png", "image/jpg"];
+        if (!validImageTypes.includes(file.type.toLowerCase())) {
+            alert("Invalid file type. Please upload a JPG or PNG image.");
+            fileInput.value = ""; // Reset input field
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            imagePreview.src = e.target.result;
+            imagePreview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // Handle Image Submission
+    submitImageButton.addEventListener("click", async function () {
+        if (!imagePreview.src || imagePreview.src.includes("placeholder")) {
+            alert("Please upload or capture an image before submitting.");
+            return;
+        }
+
+        addMessage("Processing image...", "bot-message");
+
+        // Convert image to Base64
+        const imageData = imagePreview.src.split(",")[1]; // Remove data:image/png;base64,
+
+        // Send to backend
+        try {
+            const response = await fetch("http://your-backend-url.com/analyze", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ image: imageData }),
+            });
+
+            const result = await response.json();
+
+            // Display the response from backend
+            if (result.success) {
+                addMessage(`This looks like ${result.category}.`, "bot-message");
+            } else {
+                addMessage("I couldn't identify the item. Please try again.", "bot-message");
+            }
+        } catch (error) {
+            console.error("Error submitting image:", error);
+            addMessage("Error processing the image. Please try again later.", "bot-message");
+        }
+    });
+});
+
+
+</script>
+
+</script>
+</body>
+</html>

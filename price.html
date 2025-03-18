@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Waste Management Pricing</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; padding: 20px; background-color: linear-gradient(144deg, #af40ff, #5b42f3 50%, #00ddeb); }
+        .container { max-width: 800px; margin: auto; background: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%); padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; }
+        
+        .like-btn, .calculate-btn, .home-btn {
+            margin-top: 20px; 
+            padding: 10px 20px; 
+            background: linear-gradient(144deg, #af40ff, #5b42f3 50%, #00ddeb);
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .like-btn:hover, .calculate-btn:hover, .home-btn:hover { 
+            opacity: 0.9; 
+            transform: scale(1.05);
+        }
+
+        #like-count, #total-price { font-weight: bold; }
+        .box { padding: 20px; background:linear-gradient(144deg, #af40ff, #5b42f3 50%, #00ddeb); border-radius: 5px; margin-top: 10px; text-align: center; }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+    <script>
+        let likeCount = 0;
+        function addLike() {
+            likeCount++;
+            document.getElementById("like-count").innerText = likeCount;
+        }
+        
+        function calculateTotal() {
+            let total = 0;
+            let select = document.getElementById("ewaste-items");
+            let selectedOption = select.options[select.selectedIndex];
+            total = parseFloat(selectedOption.getAttribute("data-price")) || 0;
+            document.getElementById("total-price").innerText = "₹" + total.toFixed(2);
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>E-Waste Management Pricing</h1>
+        <p>We collect and recycle electronic waste at affordable prices. Choose an item to see the price:</p>
+        
+        <div class="box">
+            <label for="ewaste-items">Select an electronic waste item:</label>
+            <select id="ewaste-items" onchange="calculateTotal()">
+                <option value="" data-price="0">-- Select an item --</option>
+                <option value="Laptops" data-price="830">Laptops - ₹830 per unit</option>
+                <option value="Desktops" data-price="1250">Desktops - ₹1250 per unit</option>
+                <option value="Mobile Phones" data-price="415">Mobile Phones - ₹415 per unit</option>
+                <option value="Printers" data-price="995">Printers - ₹995 per unit</option>
+                <option value="TVs" data-price="1660">TVs - ₹1660 per unit</option>
+                <option value="Tablets" data-price="665">Tablets - ₹665 per unit</option>
+                <option value="Monitors" data-price="830">Monitors - ₹830 per unit</option>
+                <option value="Keyboards" data-price="250">Keyboards - ₹250 per unit</option>
+                <option value="Mice" data-price="165">Mice - ₹165 per unit</option>
+                <option value="Routers" data-price="580">Routers - ₹580 per unit</option>
+                <option value="Hard Drives" data-price="500">Hard Drives - ₹500 per unit</option>
+                <option value="USB Flash Drives" data-price="330">USB Flash Drives - ₹330 per unit</option>
+                <option value="Speakers" data-price="415">Speakers - ₹415 per unit</option>
+                <option value="Headphones" data-price="500">Headphones - ₹500 per unit</option>
+                <option value="Projectors" data-price="1500">Projectors - ₹1500 per unit</option>
+                <option value="Cameras" data-price="830">Cameras - ₹830 per unit</option>
+                <option value="Smartwatches" data-price="995">Smartwatches - ₹995 per unit</option>
+                <option value="Scanners" data-price="1160">Scanners - ₹1160 per unit</option>
+                <option value="Game Consoles" data-price="665">Game Consoles - ₹665 per unit</option>
+            </select>
+            
+            <p>Total Price: <span id="total-price">₹0.00</span></p>
+        </div>
+
+        <div class="button-container">
+            <button class="like-btn" onclick="addLike()">Like 👍</button>
+            <p>Likes: <span id="like-count">0</span></p>
+            
+            <a href="index.php" class="home-btn">← Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>
